@@ -224,6 +224,7 @@ const AppContent: React.FC = () => {
       content,
       imageUrl,
       upvotes: [],
+      downvotes: [],
       status: 'pending',
       createdAt: Date.now(),
     };
@@ -359,12 +360,7 @@ const AppContent: React.FC = () => {
     };
     try {
       await addDoc(collection(db, 'buddy_posts'), newPost);
-      addNotification({
-        recipientUid: user.uid,
-        title: 'Buddy Request Posted!',
-        message: `Your ${category} buddy request is now visible.`,
-        type: 'buddy'
-      });
+      // No self-notification as requested
     } catch (err) {
       handleFirestoreError(err, OperationType.CREATE, 'buddy_posts');
     }
@@ -401,12 +397,14 @@ const AppContent: React.FC = () => {
       const data = qSnap.data() as StudentQuery;
       await updateDoc(qRef, { status: 'resolved' });
       // Notify author
-      addNotification({
-        recipientUid: data.authorUid,
-        title: 'Query Resolved!',
-        message: 'Your query has been marked as resolved.',
-        type: 'query'
-      });
+      if (data.authorUid !== user.uid) {
+        addNotification({
+          recipientUid: data.authorUid,
+          title: 'Query Resolved!',
+          message: 'Your query has been marked as resolved.',
+          type: 'query'
+        });
+      }
     }
   };
 
@@ -461,15 +459,17 @@ const AppContent: React.FC = () => {
       });
     }
 
-    addNotification({
-      recipientUid,
-      senderUid: user.uid,
-      senderName: user.displayName,
-      senderPhoto: user.photoURL,
-      title: 'New Message',
-      message: `${user.displayName} sent you a message.`,
-      type: 'system'
-    });
+    if (recipientUid !== user.uid) {
+      addNotification({
+        recipientUid,
+        senderUid: user.uid,
+        senderName: user.displayName,
+        senderPhoto: user.photoURL,
+        title: 'New Message',
+        message: `${user.displayName} sent you a message.`,
+        type: 'system'
+      });
+    }
   };
 
   const handleConnectBuddy = async (post: BuddyPost) => {

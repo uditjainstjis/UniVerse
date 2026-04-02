@@ -58,6 +58,7 @@ export interface StudentQuery {
   content: string;
   imageUrl?: string;
   upvotes: string[]; // Array of UIDs
+  downvotes: string[]; // Array of UIDs
   status: QueryStatus;
   createdAt: number;
   replies?: QueryReply[];

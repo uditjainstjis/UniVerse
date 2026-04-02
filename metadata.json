@@ -1,0 +1,5 @@
+{
+  "name": "UniVerse: The Ultimate Student Network",
+  "description": "A modern, real-time community platform for university students featuring queries, shared orders, buddy finding, and campus support.",
+  "requestFramePermissions": ["geolocation", "camera"]
+}
